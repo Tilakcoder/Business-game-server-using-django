@@ -2,7 +2,7 @@
 Hello everyone, This is a simple project which consists of real-time virtual money payment gateway. I made this program just to solve the change problems in money related board games.
 
 # About-Project-Development
-I have used django and channels (in-memory channels) to make this project. This project consists of Python, Html, CSS and Javascript languages. All the CSS and Javascript codes are inserted in HTML files only ,i.e, There is only in-page CSS and Javascript. In this project I have mad eteo django apps named ``business`` and ``chat``. whole game is based on these two apps. Al the ``.html`` files are arranged in ``templates`` folder.
+I have used django and channels (in-memory channels) to make this project. This project consists of Python, Html, CSS and Javascript languages. All the CSS and Javascript codes are inserted in HTML files only ,i.e, There is only in-page CSS and Javascript. In this project I have made two django apps named ``business`` and ``chat``. whole game is based on these two apps. Al the ``.html`` files are arranged in ``templates`` folder.
 
 ``chat`` app is used handle websocket connections and ``business`` app is used to manage all the data in the form of Django models.
 
