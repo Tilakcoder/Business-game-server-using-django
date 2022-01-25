@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body{
+            margin: 0px;
+            overflow: hidden;
+        }
+        nav{
+            text-align: center;
+            border-bottom: 1px solid black;
+        }
+        #amount{
+            font-size: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid black;
+        }
+        .button{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid black;
+        }
+        .button>button{
+            width: 98vw;
+            font-size: 30px;
+            margin: 5px;
+        }
+        #report{
+            border: 1px solid black;
+            height: 430px;
+            overflow-y: scroll;
+        }
+        #report>div{
+            padding: 4px;
+            text-align: center;
+        }
+        .payed{
+            background: rgb(251, 138, 138);
+            color: rgb(255, 255, 255);
+        }
+        .recieved{
+            background: rgb(131, 248, 151);
+        }
+        .hide{
+            display: none;
+        }
+        .cover{
+            width: 100vw;
+            height: 100vh;
+            display: inline-block;
+            position: fixed;
+            top: 0px;
+            background: rgba(255, 255, 255, 0.945);
+        }
+        .cover>div>div{
+            font-size: 30px;
+            border-bottom: 1px solid black;
+            text-align: center;
+            margin: 5px;
+        }
+        .cover>div>div>button{
+            font-size: 30px;
+            padding: 2px;
+        }
+        .cross{
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            font-size: 30px;
+        }
+        .panel{
+            background: white;
+            width: 70vw;
+            border: 1px solid black;
+        }
+        #displayer{
+            display: flex;
+            justify-content: center;
+        }
+        .pad{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            overflow-y: scroll;
+            height: 80vh;
+        }
+        .pad>button{
+            width: 122px;
+            height: 122px;
+            font-size: 30px;
+        }
+
+        /* decor  */
+        .paying{
+            background: rgb(236, 94, 94);
+            color: white;
+        }
+        #notification{
+            position: fixed;
+            font-size: 30px;
+            top: -45px;
+            width: 100vw;
+            text-align: center;
+        }
+        .hurray{
+            color: green;
+            border: 1px solid green;
+            background: rgb(198, 255, 198);
+        }
+        .danger{
+            color: red;
+            border: 1px solid red;
+            background: rgb(233, 137, 137);
+        }
+        #noti{
+            border-radius: 20px;
+            width: 70vw;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <b>You:</b><span id="you">{{Player_name}}</span> | <b>Board: </b><span id="board">{{board_name}}</span>
+</nav>
+<div id="amount">{{Amount}}</div>
+<div class="button">
+    <button class="paying" onclick="show_this('payto')">Pay</button>
+    <button onclick="show_this('players')">Players</button>
+</div>
+<b>
+<div id="report">
+    <!-- <div class="payed">Babu: 200</div>
+    <div class="recieved">Gungun: 200</div> -->
+
+</div>
+</b>
+<div id="players" class="hide">
+    <button class="cross" onclick="do_hide('players')">X</button>
+    <div id="listing_p">
+        {% for player in all_ps %}
+        <div class='{{player.name}}'>{{player.name}} - <span id="{{player.name}}">{{player.amount}}</span></div>
+        {% endfor %}
+    </div>
+</div>
+<div id="payto" class="hide">
+    <button class="cross" onclick="do_hide('payto', true)">X</button>
+    <div id="rest">
+        {% for player in all_ps %}
+        {% if player.name != Player_name %}
+        <div><button onclick="pay('{{player.name}}')">{{player.name}}</button></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div id="currency" class="hide">
+        <div class="header"></div>
+        <div id="displayer">
+            <div class="panel">0</div>
+            <button onclick="set(0)">C</button>
+        </div>
+        <div class="pad">
+            <button class="coin" style="background: pink;" onclick="add(10000)">10000</button>
+            <button class="coin" style="background: white; color:black;" onclick="add(5000)">5000</button>
+            <button class="coin" style="background: rgb(70, 230, 70);" onclick="add(1000)">1000</button>
+            <button class="coin" style="background: rgb(241, 121, 121); color: yellow;" onclick="add(500)">500</button>
+            <button class="coin" style="background: yellow;" onclick="add(100)">100</button>
+            <button class="coin" style="background: purple; color: white;"onclick="add(50)">50</button>
+            <button class="undo" onclick="move_last()">Undo</button>
+            <button class="pay paying" onclick="payment()">Pay</button>
+        </div>
+    </div>
+</div>
+<div id="notification">
+    <div id="noti">dfdfv</div>
+</div>
+<script>
+    const me = document.getElementById('you').innerHTML;
+    main_a = document.getElementById('amount');
+    const report = document.getElementById('report');
+    const board = document.getElementById('board').innerHTML;
+    function do_hide(who, cur=false){
+        p = document.getElementById(who);
+        p.classList.remove('cover');
+        p.classList.add('hide');
+        if(cur){
+            show_this('rest', false)
+            document.getElementById('currency').classList.add('hide');
+        }
+    }
+    function show_this(which, cover=true){
+        p = document.getElementById(which);
+        p.classList.remove('hide');
+        if(cover){
+            p.classList.add('cover');
+        }
+    }
+    function pay(whom){
+        document.getElementsByClassName('header')[0].innerHTML = whom;
+        do_hide('rest');
+        show_this('currency', false);
+    }
+    activity = [];
+    const panel = document.getElementsByClassName('panel')[0];
+    function add(amount){
+        panel.innerHTML = parseInt(panel.innerHTML)+amount;
+        activity = activity.concat([amount]);
+    }
+    function move_last(){
+        if(activity.length >= 1){
+            amount = activity[activity.length-1];
+            panel.innerHTML = parseInt(panel.innerHTML)-amount;
+            activity.pop(activity.length-1);
+        }
+    }
+    function set(amount){
+        panel.innerHTML = amount;
+        activity = [];
+    }
+    notify = document.getElementById('notification');
+    function payment(){
+        player_name = document.getElementsByClassName('header')[0].innerHTML;
+        amount = parseInt(panel.innerHTML);
+        chatSocket.send(JSON.stringify({
+                'message': [me, 'payment', player_name, amount, board]
+            }));
+        main_a.innerHTML = parseInt(main_a.innerHTML) - amount;
+        report.innerHTML = "<div class='payed'>"+player_name+":"+amount+"</div>"+report.innerHTML;
+        do_hide('payto', true)
+        set(0);
+        notify.innerHTML = "<div id='noti' class='danger'>Payed "+ amount+" to "+player_name+"</div>";
+        showthen();
+    }
+    fr = 0;
+    sp = 1;
+    wait = 80;
+    cy = true;
+    function showthen(){
+        if(fr%sp==0){
+            if(notify.offsetTop<0 && cy){
+                notify.style.top = notify.offsetTop+2+'px';
+            }
+            else if(wait != 0){
+                wait -=1;
+                cy = false
+            }
+            else if(notify.offsetTop*-1<notify.offsetHeight){
+                notify.style.top = notify.offsetTop-1+'px';
+            }
+            else{
+                fr = 0;
+                sp = 1;
+                wait = 80;
+                cy = true;
+                return 0;
+            }
+        }
+        fr+=1;
+        window.requestAnimationFrame(showthen);
+    }
+</script>
+<script>
+    const roomName = '{{board_name}}';
+
+    const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+    chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            d = data.message
+            console.log(d);
+            if(d[1] == 'payment'){
+                raiser = d[0];
+                his_id = document.getElementById(raiser);
+                his_id.innerHTML = parseInt(his_id.innerHTML)-d[3];
+                him_id = document.getElementById(d[2]);
+                him_id.innerHTML = parseInt(him_id.innerHTML)+d[3];
+                if(d[2] == me){
+                    main_a.innerHTML = him_id.innerHTML;
+                    report.innerHTML = "<div class='recieved'>"+raiser+":"+d[3]+"</div>"+report.innerHTML;
+                    notify.innerHTML = "<div id='noti' class='hurray'>You recieved "+d[3]+"</div>";
+                    showthen();
+                }
+            }
+            else{
+                new_p = d[0]
+                new_a = d[2]
+                plist = document.getElementById('listing_p');
+                plist.innerHTML += "<div class='"+new_p+"'"+">"+new_p+" - <span id='"+new_p+"'>"+new_a+"</span></div>";
+                rest_list = document.getElementById('rest');
+                rest.innerHTML += `<div><button onclick="pay('`+new_p+`')">`+new_p+`</button></div>`;
+            }
+        };
+
+    chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+    // chatSocket.send(JSON.stringify({
+    //             'message': message
+    //         }));
+</script>
+</body>
+</html>
