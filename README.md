@@ -9,5 +9,5 @@ I have used django and channels (in-memory channels) to make this project. This 
 # How-to-run-this-project
 This project templates has responsive designs because there main use will be with the mobile phones. As we are going to use this app for virtual money transfer from mobile to mobile. So, we have to run this server program that can server pages to another devices in the network. For making it possible localhost ,i.e., ``127.0.0.1`` will not work for other devices you can just play among diffrent tabs of the browser only inside the system where the server is running.
 
-So, For making the server live for other devices you need to know your IP address first and enter it in ``allowed_hosts`` lists in ``settings.py`` file. Now activate the virtual environment and run the below command to run the server:
+So, For making the server live for other devices you need to know your IP address first and enter it in ``allowed_hosts`` lists in ``settings.py`` file. Run the below command to run the server:
 ``python manage.py runserver 'your-ip-address':8000``
